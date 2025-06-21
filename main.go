@@ -11,7 +11,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/theme"
 )
 
 // Config struct holds the structure of the configuration
@@ -213,11 +213,12 @@ rawOutputContainer := container.NewHBox(rawOutputCheckbox, rawNoteLabel)
 
 
 	// Button to copy the password to clipboard
-	copyButton := widget.NewButtonWithIcon("", fyne.NewStaticResource("copy", []byte("📋")), func() {
-		clipboard := fyne.CurrentApp().Driver().AllWindows()[0].Clipboard()
-		clipboard.SetContent(passwordLabel.Text) // Copy only the password
-		dialog.ShowInformation("Copied", "Password copied to clipboard!", w)
-	})
+	copyButton := widget.NewButtonWithIcon("", theme.ContentCopyIcon(), func() {
+    clipboard := fyne.CurrentApp().Driver().AllWindows()[0].Clipboard()
+    clipboard.SetContent(passwordLabel.Text)
+    // dialog.ShowInformation("Copied", "Password copied to clipboard!", w)
+})
+
 
 	// Hyperlink to Patreon (bottom right corner)
 	patreonLink := widget.NewHyperlink("Magic Industries", nil)
