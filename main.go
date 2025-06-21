@@ -135,6 +135,32 @@ func main() {
 	specialCharCheckbox := widget.NewCheck("Include Special Characters", nil)
 	numbersCheckbox := widget.NewCheck("Include Numbers", nil)
 
+// Raw output toggle
+rawOutputCheckbox := widget.NewCheck("Show Raw Output", func(checked bool) {
+	if checked {
+		// Disable other password options
+		uppercaseCheckbox.SetChecked(false)
+		specialCharCheckbox.SetChecked(false)
+		numbersCheckbox.SetChecked(false)
+
+		uppercaseCheckbox.Disable()
+		specialCharCheckbox.Disable()
+		numbersCheckbox.Disable()
+	} else {
+		// Re-enable them if raw is unchecked
+		uppercaseCheckbox.Enable()
+		specialCharCheckbox.Enable()
+		numbersCheckbox.Enable()
+	}
+})
+
+// Star note label
+rawNoteLabel := widget.NewLabel("⭐ Generates the best passwords, but they are raw numbers")
+rawNoteLabel.Alignment = fyne.TextAlignLeading
+
+// Put checkbox and note label side by side
+rawOutputContainer := container.NewHBox(rawOutputCheckbox, rawNoteLabel)
+
 	// Label to display the generated password (with wrapping enabled)
 	passwordLabel := widget.NewLabel("")
 	passwordLabel.Wrapping = fyne.TextWrapWord
@@ -152,11 +178,11 @@ func main() {
 	startUppercase := uppercaseCheckbox.Checked
 	includeSpecialChar := specialCharCheckbox.Checked
 	includeNumbers := numbersCheckbox.Checked
+	rawOutput := rawOutputCheckbox.Checked
 
 	// Load the config file
 	config, err := loadConfig("config.json")
 	if err != nil || config.APIKey == "" {
-		// Stop execution and show the error message if API key is missing or config load fails
 		passwordLabel.SetText("Add API key to config.json")
 		return
 	}
@@ -164,14 +190,24 @@ func main() {
 	// Fetch quantum numbers from the API
 	data, err := GetQuantumNumbers(config.APIKey, length, "uint8", 100)
 	if err != nil {
-		// Stop execution and show the error message if API request fails
 		passwordLabel.SetText("Error fetching quantum numbers: Add API key to config.json")
 		return
 	}
 
-	// If everything is successful, then process the data into a password
+	if rawOutput {
+    // Output raw quantum numbers as plain concatenated decimal digits (no commas)
+    rawText := ""
+    for i := 0; i < length && i < len(data); i++ {
+        rawText += fmt.Sprintf("%d", data[i])
+        // NO comma added here
+    }
+    passwordLabel.SetText(rawText)
+    return
+}
+
+	// Process and analyze password
 	password := processPasswordData(data, startUppercase, includeSpecialChar, includeNumbers, length)
-	passwordLabel.SetText(password) // Only display the password
+	passwordLabel.SetText(password)
 })
 
 
@@ -201,7 +237,9 @@ func main() {
 			uppercaseCheckbox,
 			specialCharCheckbox,
 			numbersCheckbox,
+			rawOutputContainer,
 			generateButton,
+		
 			container.NewHBox(
 				container.NewScroll(passwordLabel), // Wrap the label in a scroll container
 				copyButton,
