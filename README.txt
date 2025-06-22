@@ -4,6 +4,24 @@ Free pre-compiled binary available on my Gumroad: https://magicindustries.gumroa
 
 QuantumPass is a password generator based on quantum numbers from the AQN API. This README provides instructions for compiling the application on different systems and explains the inclusion of a non-maintained `.exe` binary for Windows users.
 
+# Rationale
+
+QuantumPass’s core randomness source is truly quantum-generated numbers, offering high entropy. However, mapping these raw quantum values to fit typical password constraints (letters, digits, special characters) significantly reduces the effective randomness because it restricts the possible character set per position, lowering entropy per character.
+
+Moreover, common password analyzers and crackers often expect passwords encoded in standard ways (like Base64, hex, or common alphanumeric sets). These encodings introduce patterns and structure, making the passwords appear weaker or easier to predict to automated tools.
+
+In contrast, QuantumPass can output raw quantum numbers as digits only. While this may look unusual (only digits), it retains full entropy from the quantum source since no compression or re-encoding happens. Password analyzers and crackers rarely expect or specifically target purely numeric passwords of sufficient length generated from quantum randomness, making them effectively more secure than they might seem at first glance.
+
+This represents a tradeoff between usability and maximum entropy:
+
+Applying constraints (uppercase, special chars, etc.) makes passwords more compatible with typical password policies but reduces entropy.
+
+Using raw quantum digits maximizes entropy but may not meet all password policy requirements.
+
+Increasing password length compensates for entropy loss caused by constraints.
+
+This approach emphasizes true randomness over conformity to typical password formats, pushing the boundaries of password security.
+
 ## Files Provided
 
 The following files are included in the repository:
